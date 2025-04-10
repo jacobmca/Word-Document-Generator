@@ -7,9 +7,14 @@ import "./App.css";
 const WordTemplateFiller = () => {
   const [file, setFile] = useState(null);
   const [formData, setFormData] = useState({
-    Date: '',
-    Project: '',
-    JobTitle: ''
+    date: '',
+    artist: '',
+    project: '',
+    jobTitle: '',
+    occupationCode: '',
+    wageScale: '',
+    hours: '',
+    hourlyRate: ''
   });
 
   const handleFileChange = (e) => {
@@ -18,19 +23,10 @@ const WordTemplateFiller = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === 'Date') {
-      // For the date field, store the original format
-      setFormData(prevState => ({
-        ...prevState,
-        [name]: value // Keep the yyyy-MM-dd format for the input field
-      }));
-    } else {
-      setFormData(prevState => ({
-        ...prevState,
-        [name]: value
-      }));
-    }
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
   };
 
   const generateDocument = async () => {
@@ -47,20 +43,23 @@ const WordTemplateFiller = () => {
         console.log('ZIP created successfully');
   
         // Format the date for the document
-        let formattedDate = formData.Date;
-        if (formData.Date) {
-          const date = new Date(formData.Date);
-          formattedDate = date.toLocaleDateString('en-US', {
+        const formattedDate = formData.date 
+        ? new Date(formData.date).toLocaleDateString('en-US', {
             month: '2-digit',
             day: '2-digit',
             year: 'numeric'
-          });
-        }
+          })
+        : '';
   
         const templateData = {
-          Date: formattedDate,
-          Project: formData.Project,
-          JobTitle: formData.JobTitle
+          date: formattedDate,
+          artist: formData.artist,
+          project: formData.project,
+          jobTitle: formData.jobTitle,
+          occupationCode: formData.occupationCode,
+          wageScale: formData.wageScale,
+          hours: formData.hours,
+          hourlyRate: formData.hourlyRate
         };
   
         console.log('Template Data:', JSON.stringify(templateData, null, 2));
@@ -68,10 +67,18 @@ const WordTemplateFiller = () => {
         const doc = new Docxtemplater(zip, {
           paragraphLoop: true,
           linebreaks: true,
+          delimiters: {
+            start: '{',  // Single curly brace
+            end: '}'     // Single curly brace
+          },
+          debug: true,
           data: templateData
         });
-  
+
+        doc.setData(templateData);
+    
         console.log('About to render document');
+        console.log('Final template data being used:', templateData);
         doc.render();
         console.log('Document rendered successfully');
   
@@ -84,6 +91,11 @@ const WordTemplateFiller = () => {
   
         saveAs(blob, "filled-template.docx");
       } catch (error) {
+        // If the error contains additional information in the properties
+        if (error.properties && error.properties.errors instanceof Array) {
+          const errorMessages = error.properties.errors.map(error => error.properties.explanation).join("\n");
+          console.error('Templating errors: ', errorMessages);
+        }
         console.error("Detailed error:", {
           message: error.message,
           properties: error.properties,
@@ -92,7 +104,7 @@ const WordTemplateFiller = () => {
         alert("Error generating document. Check console for details.");
       }
     };
-  };
+  };  
 
   return (
     <div>
@@ -101,23 +113,58 @@ const WordTemplateFiller = () => {
       <div>
         <input
           type="date"
-          name="Date"
+          name="date"
           onChange={handleChange}
-          value={formData.Date || ''}
+          value={formData.date || ''}
         />
         <input
           type="text"
-          name="Project"
+          name="artist"
+          placeholder="Enter Artist Name"
+          onChange={handleChange}
+          value={formData.artist || ''}
+        />
+        <input
+          type="text"
+          name="project"
           placeholder="Enter Project"
           onChange={handleChange}
-          value={formData.Project || ''}
+          value={formData.project || ''}
         />
         <input
           type="text"
-          name="JobTitle"
+          name="jobTitle"
           placeholder="Enter Job Title"
           onChange={handleChange}
-          value={formData.JobTitle || ''}
+          value={formData.jobTitle || ''}
+        />
+        <input
+          type="text"
+          name="occupationCode"
+          placeholder="Enter Occupation Code"
+          onChange={handleChange}
+          value={formData.occupationCode || ''}
+        />
+        <input
+          type="text"
+          name="wageScale"
+          placeholder="Enter Wage Scale"
+          onChange={handleChange}
+          value={formData.wageScale || ''}
+        />
+        <input
+          type="text"
+          name="hours"
+          placeholder="Enter Hours"
+          onChange={handleChange}
+          value={formData.hours || ''}
+        />
+        <input
+          type="text"
+          name="hourlyRate"
+          placeholder="Enter Hourly Rate"
+          onChange={handleChange}
+          value={formData.hourlyRate || ''}
         />
       </div>
       <button onClick={generateDocument}>Generate Word File</button>
