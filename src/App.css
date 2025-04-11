@@ -1,8 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0; 
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  min-height: 100vh;
   padding: 2rem;
-  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .logo {
@@ -33,10 +47,48 @@
   }
 }
 
+.main-div {
+  background-image: linear-gradient(to bottom right, #005c99, #b3ecff);
+  width: 100%;
+  min-height: 100vh; /* Add min-height */
+  padding: 2rem;    /* Move padding here from #root */
+  flex: 1;          /* Allow div to grow */
+  display: flex;    /* Add flex display */
+  flex-direction: column;
+  justify-content: center;
+}
+
 .card {
   padding: 2em;
 }
 
 .read-the-docs {
   color: #888;
+}
+
+h2 {
+  font-size: 80px;
+  text-align: center;
+}
+
+.upload-file {
+  display: flex;
+  justify-content: center;
+}
+
+.input-fields {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.input {
+  padding: 12px 20px;
+  margin: 20px;
+  background-color: white;
+}
+
+.generate-button {
+  width: 100%;
+  margin-top: 20px;
 }
